@@ -62,10 +62,9 @@ jobs:
           command: docker load -i ./docker-image.tar
       - run:
           name: Set Tag
-          command: [ "${CIRCLE_TAG}" != "" ] && TAG=${CIRCLE_TAG} || TAG=latest
-      - run:
-          name: Tag to latest
-          command: docker tag ${OWNER}/${IMAGE_NAME}:latest ${OWNER}/${IMAGE_NAME}:${TAG}
+          command: |
+            [ "${CIRCLE_TAG}" != "" ] && TAG=${CIRCLE_TAG} || TAG=latest
+            docker tag ${OWNER}/${IMAGE_NAME}:latest ${OWNER}/${IMAGE_NAME}:${TAG}
       - run:
           name: Docker Login
           command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
