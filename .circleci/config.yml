@@ -43,7 +43,7 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: docker build -t ${OWNER}/${IMAGE_NAME}:latest .
+          command: docker build -t ${OWNER}/${IMAGE_NAME}:latest --build-arg python_version="3.6.3" -f docker/Dockerfile .
       - run:
           name: Save image
           command: docker image save ${OWNER}/${IMAGE_NAME}:latest > ./docker-image.tar
