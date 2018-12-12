@@ -1,7 +1,7 @@
 alias:
   default_env: &docker_env
     docker:
-      - image: docker:17.03.0-ce
+      - image: docker:17.03.0-ce-git
     working_directory: /go/src/github.com/project/repo
   setup_remote_docker: &setup_remote_docker
     version: 17.03.0-ce
