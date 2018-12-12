@@ -1,6 +1,15 @@
+alias:
+  default_env: &docker_env
+    docker:
+      - image: docker:17.03.0-ce-git
+    working_directory: /go/src/github.com/project/repo
+  setup_remote_docker: &setup_remote_docker
+    version: 17.03.0-ce
+    docker_layer_caching: true
+
 version: 2
 jobs:
-  build:
+  document_build:
     docker:
       - image: circleci/python:3.6
     working_directory: ~/repo
@@ -13,7 +22,7 @@ jobs:
           paths:
             - html
 
-  deploy:
+  document_deploy:
     docker:
       - image: circleci/node:7.10
     working_directory: ~/repo
@@ -27,14 +36,67 @@ jobs:
       # Deploy
       - run: cd .firebase && firebase deploy --project "$FIREBASE_PJ" --token "$FIREBASE_TOKEN"
 
+  docker_build:
+    <<: *docker_env
+    steps:
+      - setup_remote_docker: *setup_remote_docker
+      - checkout
+      - run:
+          name: Update submodule
+          command: git submodule update --init --recursive
+      - run:
+          name: Build
+          command: docker build -t ${OWNER}/${IMAGE_NAME}:latest --build-arg python_version="3.6.3" -f docker/Dockerfile .
+      - run:
+          name: Save image
+          command: docker image save ${OWNER}/${IMAGE_NAME}:latest > ./docker-image.tar
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./docker-image.tar
+  docker_deploy:
+    <<: *docker_env
+    steps:
+      - setup_remote_docker: *setup_remote_docker
+      - attach_workspace:
+          at: .
+      - run:
+          name: Load image from tar
+          command: docker load -i ./docker-image.tar
+      - run:
+          name: Set Tag
+          command: |
+            [ "${CIRCLE_TAG}" != "" ] && TAG=${CIRCLE_TAG} || TAG=latest
+            docker tag ${OWNER}/${IMAGE_NAME}:latest ${OWNER}/${IMAGE_NAME}:${TAG}
+      - run:
+          name: Docker Login
+          command: docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+      - run:
+          name: Push image to registory
+          command: docker push ${OWNER}/${IMAGE_NAME}
+
 workflows:
   version: 2
-  build_and_deploy:
+  document_build_and_deploy:
     jobs:
-      - build
-      - deploy:
+      - document_build
+      - document_deploy:
           requires:
-            - build
+            - document_build
           filters:
             branches:
               only: master
+  docker_build_and_deploy:
+    jobs:
+      - docker_build:
+          filters:
+            tags:
+              only: /.*/
+      - docker_deploy:
+          requires:
+            - docker_build
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /.*/
