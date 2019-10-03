@@ -76,7 +76,7 @@ class TestCaseFPGABase(TestCaseDLKBase):
     build_dir = None
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         # Setup the board. For now, DE10 Nano board
         output_path = '/tmp'
         hw_path = os.path.abspath(os.path.join('..', FPGA_FILES))
