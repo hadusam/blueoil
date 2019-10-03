@@ -16,8 +16,8 @@
 """Test file for code generation"""
 from nose2.tools import params
 import os
-from test_code_generation import TestCodeGenerationBase, get_configurations_by_architecture
-from test_code_generation import get_configurations_by_test_cases, dict_codegen_classification
+from test_code_generation_base import TestCodeGenerationBase, get_configurations_by_architecture
+from test_code_generation_base import get_configurations_by_test_cases, dict_codegen_classification
 from tstconf import CURRENT_TEST_LEVEL
 from tstutils import updated_dict, TEST_LEVEL_FUTURE_TARGET
 import unittest

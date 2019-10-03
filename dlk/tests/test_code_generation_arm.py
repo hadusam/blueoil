@@ -15,7 +15,7 @@
 # =============================================================================
 """Test file for code generation"""
 from nose2.tools import params
-from test_code_generation import TestCodeGenerationBase, get_configurations_by_architecture
+from test_code_generation_base import TestCodeGenerationBase, get_configurations_by_architecture
 from testcase_dlk_base import TestCaseFPGABase
 import unittest
 
