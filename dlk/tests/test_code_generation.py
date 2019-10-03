@@ -95,13 +95,13 @@ def get_configurations_by_architecture(test_cases, cpu_name):
 
 
 class TestCodeGenerationBase(TestCaseDLKBase):
-    """Test class for code generation testing."""
+    """Base class for code generation testing."""
 
     project_name = 'code_generation'
 
     def run_test_code_generation(self, i, configuration) -> None:
 
-        print(f"\nCode_generation test: testcase {configuration}")
+        print(f"\nCode generation test: ID: {i}, Testcase: {configuration}")
         #  TODO consider better implementation
         this_test_level = configuration.get("test_level", 0)
         if this_test_level < CURRENT_TEST_LEVEL:
@@ -112,7 +112,6 @@ class TestCodeGenerationBase(TestCaseDLKBase):
 
     def run_test_binary_exec(self, i, configuration) -> None:
 
-        print(f"\nBinary_exec test: testcase {configuration}")
         #  TODO consider better implementation
         this_test_level = configuration.get("test_level", 0)
         if this_test_level < CURRENT_TEST_LEVEL:

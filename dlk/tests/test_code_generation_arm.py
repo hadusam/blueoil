@@ -34,7 +34,7 @@ def get_configurations():
 
 
 class TestCodeGenerationArm(TestCodeGenerationBase, TestCaseFPGABase):
-    """Test class for code generation testing."""
+    """Test class for code generation testing of arm."""
 
     @params(*get_configurations())
     def test_code_generation(self, i, configuration) -> None:

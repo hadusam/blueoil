@@ -49,7 +49,7 @@ def get_configurations():
 
 
 class TestCodeGenerationX8664(TestCodeGenerationBase):
-    """Test class for code generation testing."""
+    """Test class for code generation testing of x86_64."""
 
     @params(*get_configurations())
     def test_code_generation(self, i, configuration) -> None:
