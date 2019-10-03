@@ -34,366 +34,89 @@ from tstconf import CURRENT_TEST_LEVEL
 from tstutils import updated_dict, run_and_check, TEST_LEVEL_FUTURE_TARGET, FPGA_HOST
 
 
-def dict_codegen_classification_x86() -> dict:
-    """Test parameters for testing code generation for classification on CPU (float only)"""
-    return {'model_path': os.path.join('examples', 'classification', 'lmnet_quantize_cifar10'),
-            'expected_output_set_name': 'cat.jpg',
+def dict_codegen_classification(cpu_name) -> dict:
+    """Test parameters for testing code generation for classification on CPU (lmnet_quantize)"""
+    return {'model_path': os.path.join('examples', 'classification', 'lmnet_quantize_cifar10_space_to_depth'),
+            'expected_output_set_name': '1000_dog.png',
             'prefix': 'cls',
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '133_output:0.npy',
-            'hard_quantize': False,
-            'threshold_skipping': False,
-            'use_avx': False
+            'cpu_name': cpu_name,
             }
 
 
-def dict_codegen_resnet_classification_x86() -> dict:
+def dict_codegen_classification_resnet(cpu_name) -> dict:
     """Test parameters for testing code generation for classification on CPU (float only)"""
     return {'model_path': os.path.join('examples', 'classification', 'resnet_quantize_cifar10'),
             'expected_output_set_name': '9984_horse.png',
-            'prefix': 'resnet_cls',
+            'prefix': 'cls_resnet',
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '368_output:0.npy',
-            'hard_quantize': False,
-            'threshold_skipping': False,
-            'use_avx': False
+            'cpu_name': cpu_name,
             }
 
 
-def dict_codegen_group_conv_classification_x86() -> dict:
-    """Test parameters for testing code generation for classification on CPU"""
-    return {'model_path': os.path.join('examples', 'classification', 'lmnet_v1_group_conv'),
-            'expected_output_set_name': 'horse.png',
-            'prefix': 'gconv_cls',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '149_output:0.npy',
-            'hard_quantize': False,
-            'threshold_skipping': False,
-            'use_avx': False
-            }
-
-
-def dict_codegen_classification_cpu_hq_ts() -> dict:
-    """Test parameters for testing code generation for classification on CPU with both hard quantize
-       and threshold-skipping
-    """
-    return {'model_path': os.path.join('examples', 'classification', 'lmnet_quantize_cifar10_space_to_depth'),
-            'expected_output_set_name': '1000_dog.png',
-            'prefix': 'ts_cls',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '133_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': True,
-            'use_avx': False
-            }
-
-
-def dict_codegen_classification_fpga() -> dict:
-    """Test parameters for testing code generation for classification on FPGA
-    """
-    return {'model_path': os.path.join('examples', 'classification', 'lmnet_quantize_cifar10_space_to_depth'),
-            'expected_output_set_name': '1000_dog.png',
-            'prefix': 'fpga_cls',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '133_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': False,
-            'cpu_name': 'arm_fpga',
-            'need_arm_compiler': True,
-            'cache_dma': False,
-            }
-
-
-def dict_codegen_classification_resnet_fpga() -> dict:
-    """Test parameters for testing code generation for classification on FPGA
-    """
-    return {'model_path': os.path.join('examples', 'classification', 'resnet_quantize_cifar10'),
-            'expected_output_set_name': '9984_horse.png',
-            'prefix': 'fpga_cls_resnet',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '368_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': False,
-            'cpu_name': 'arm_fpga',
-            'need_arm_compiler': True,
-            'cache_dma': False,
-            }
-
-
-def dict_codegen_object_detection_fpga() -> dict:
-    """Test parameters for testing code generation for object detection on FPGA
-    """
-    return {'model_path': os.path.join('examples', 'object_detection', 'fyolo_quantize_4_v4'),
-            'expected_output_set_name': 'network_input_output',
-            'prefix': 'fpga_detection_fyolo',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '317_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': False,
-            'cpu_name': 'arm_fpga',
-            'need_arm_compiler': True,
-            'cache_dma': False,
-            }
-
-
-def dict_codegen_object_detection_widerface_fpga() -> dict:
-    """Test parameters for testing code generation for object detection on FPGA
-    """
-    return {'model_path': os.path.join('examples', 'object_detection', 'widerface_320'),
-            'expected_output_set_name': 'network_input_output',
-            'prefix': 'fpga_detection_widerface',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '337_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': False,
-            'cpu_name': 'arm_fpga',
-            'need_arm_compiler': True,
-            'cache_dma': False,
-            }
-
-
-def dict_codegen_object_detection_widerface_1x1_fpga() -> dict:
-    """Test parameters for testing code generation for object detection on FPGA
-    """
-    return {'model_path': os.path.join('examples', 'object_detection', 'widerface_v5'),
-            'expected_output_set_name': 'network_input_output',
-            'prefix': 'fpga_detection_widerface_1x1',
-            'input_name': '000_images_placeholder:0.npy',
-            'output_npy_name': '337_output:0.npy',
-            'hard_quantize': True,
-            'threshold_skipping': False,
-            'cpu_name': 'arm_fpga',
-            'need_arm_compiler': True,
-            'cache_dma': False,
-            }
-
-
-def dict_codegen_object_detection_x86() -> dict:
+def dict_codegen_object_detection(cpu_name) -> dict:
     """Test parameters for testing code generation for object detection on CPU"""
     return {'model_path': os.path.join('examples', 'object_detection', 'fyolo_quantize_4_v4'),
             'expected_output_set_name': 'network_input_output',
             'prefix': 'det',
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '317_output:0.npy',
-            'hard_quantize': False,
-            'threshold_skipping': False,
-            'use_avx': False
+            'cpu_name': cpu_name,
             }
 
 
-def dict_codegen_segmentation_x86() -> dict:
+def dict_codegen_segmentation(cpu_name) -> dict:
     """Test parameters for testing code generation for segmentation on CPU"""
     return {'model_path': os.path.join('examples', 'segmentation', 'lm_segnet_v1_quantize_camvid'),
             'expected_output_set_name': 'network_input_output',
             'prefix': 'seg',
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '227_output:0.npy',
-            'hard_quantize': False,
-            'threshold_skipping': False,
-            'use_avx': False
+            'cpu_name': cpu_name,
             }
 
+def get_configurations_by_test_cases(test_cases, configuration):
+    configurations = []
+    for test_case in test_cases:
+        configurations.append(updated_dict(configuration,test_case))
 
-def get_configurations():
-    configurations = [
-        # Classification / x86
-        dict_codegen_classification_x86(),
-        updated_dict(dict_codegen_classification_x86(), {'hard_quantize': True}),
-        updated_dict(dict_codegen_classification_x86(),
-                     {'hard_quantize': True,
-                      "input_name": 'raw_image.png', "use_run_test_script": True,
-                      "test_level": TEST_LEVEL_FUTURE_TARGET
-                      }),
-        updated_dict(dict_codegen_classification_x86(),
-                     {'hard_quantize': True, "input_name": 'preprocessed_image.npy',
-                      "use_run_test_script": True, "from_npy": True}),
+    return configurations
 
-        # Classification group convolution / x86
-        dict_codegen_group_conv_classification_x86(),
-        updated_dict(dict_codegen_group_conv_classification_x86(), {'hard_quantize': True}),
+def get_configurations_by_architecture(test_cases, cpu_name):
+    configurations = []
+    configurations.extend(get_configurations_by_test_cases(test_cases, dict_codegen_classification(cpu_name)))
+    configurations.extend(get_configurations_by_test_cases(test_cases, dict_codegen_classification_resnet(cpu_name)))
+    configurations.extend(get_configurations_by_test_cases(test_cases, dict_codegen_object_detection(cpu_name)))
+    configurations.extend(get_configurations_by_test_cases(test_cases, dict_codegen_segmentation(cpu_name)))
 
-        # Classification resnet / x86
-        dict_codegen_resnet_classification_x86(),
-        updated_dict(dict_codegen_resnet_classification_x86(), {'hard_quantize': True}),
-        updated_dict(dict_codegen_resnet_classification_x86(),
-                     {'hard_quantize': True, 'threshold_skipping': True}),
-
-        dict_codegen_classification_cpu_hq_ts(),
-
-        # Detection / x86
-        dict_codegen_object_detection_x86(),
-        updated_dict(dict_codegen_object_detection_x86(), {'hard_quantize': True}),
-        updated_dict(dict_codegen_object_detection_x86(),
-                     {'hard_quantize': True, 'threshold_skipping': True}),
-
-        # Segmentation / x86
-        dict_codegen_segmentation_x86(),
-        updated_dict(dict_codegen_segmentation_x86(), {'hard_quantize': True}),
-        updated_dict(dict_codegen_segmentation_x86(),
-                     {'hard_quantize': True, 'threshold_skipping': True}),
-
-        # Classification / x86 AVX
-        updated_dict(dict_codegen_classification_x86(), {'use_avx' : True}),
-        updated_dict(dict_codegen_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True}),
-        updated_dict(dict_codegen_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True,
-                      "input_name": 'raw_image.png', "use_run_test_script": True,
-                      "test_level": TEST_LEVEL_FUTURE_TARGET
-                      }),
-        updated_dict(dict_codegen_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True,
-                      "input_name": 'preprocessed_image.npy',
-                      "use_run_test_script": True, "from_npy": True}),
-
-        # Classification group convolution / x86 AVX
-        updated_dict(dict_codegen_group_conv_classification_x86(), {'use_avx': True}),
-        updated_dict(dict_codegen_group_conv_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True}),
-
-        # Classification resnet / x86 AVX
-        updated_dict(dict_codegen_resnet_classification_x86(), {'use_avx': True}),
-        updated_dict(dict_codegen_resnet_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True}),
-        updated_dict(dict_codegen_resnet_classification_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True,
-                      'threshold_skipping': True}),
-
-        updated_dict(dict_codegen_classification_cpu_hq_ts(), {'use_avx': True}),
-
-        # Detection / x86 AVX
-        updated_dict(dict_codegen_object_detection_x86(), {'use_avx': True}),
-        updated_dict(dict_codegen_object_detection_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True}),
-        updated_dict(dict_codegen_object_detection_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True,
-                      'threshold_skipping': True}),
-
-        # Segmentation / x86 AVX
-        updated_dict(dict_codegen_segmentation_x86(), {'use_avx': True}),
-        updated_dict(dict_codegen_segmentation_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True}),
-        updated_dict(dict_codegen_segmentation_x86(),
-                     {'hard_quantize': True,
-                      'use_avx': True,
-                      'threshold_skipping': True}),
-
-        # Classification FPGA
-        dict_codegen_classification_fpga(),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cache_dma': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': True}),
-
-        # Classification ResNet-18 on FPGA
-        dict_codegen_classification_resnet_fpga(),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cache_dma': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': True}),
-
-        # Detection on FPGA
-        dict_codegen_object_detection_fpga(),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cache_dma': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': True}),
-
-        # Detection WiderFace on FPGA
-        dict_codegen_object_detection_widerface_fpga(),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cache_dma': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': True}),
-
-        # Detection WiderFace 1x1 on FPGA
-        dict_codegen_object_detection_widerface_1x1_fpga(),
-        updated_dict(dict_codegen_object_detection_widerface_1x1_fpga(),
-                     {'cache_dma': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_object_detection_widerface_1x1_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_widerface_1x1_fpga(),
-                     {'cache_dma': True, 'threshold_skipping': True}),
-
-        # Classification ARM
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls', 'hard_quantize': False,
-                      'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls', 'hard_quantize': True,
-                      'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls', 'hard_quantize': False,
-                      'threshold_skipping': True}),
-        updated_dict(dict_codegen_classification_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls', 'hard_quantize': True,
-                      'threshold_skipping': True}),
-
-        # Classification ResNet-18 ARM
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls_rn', 'hard_quantize': False,
-                      'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls_rn', 'hard_quantize': True,
-                      'threshold_skipping': False}),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls_rn', 'hard_quantize': False,
-                      'threshold_skipping': True}),
-        updated_dict(dict_codegen_classification_resnet_fpga(),
-                     {'cpu_name': 'arm', 'prefix': 'arm_cls_rn', 'hard_quantize': True,
-                      'threshold_skipping': True}),
-
-        # Detection ARM
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det', 'hard_quantize': False, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det', 'hard_quantize': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det', 'hard_quantize': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_object_detection_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det', 'hard_quantize': True, 'threshold_skipping': True}),
-
-        # Detection WiderFace ARM
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det_wf', 'hard_quantize': False, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det_wf', 'hard_quantize': True, 'threshold_skipping': False}),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det_wf', 'hard_quantize': False, 'threshold_skipping': True}),
-        updated_dict(dict_codegen_object_detection_widerface_fpga(),
-                     {'cpu_name':'arm', 'prefix': 'arm_det_wf', 'hard_quantize': True, 'threshold_skipping': True}),
-   ]
-
-    return [(i, configuration) for i, configuration in enumerate(configurations)]
+    return configurations
 
 
-class TestCodeGeneration(TestCaseDLKBase):
+class TestCodeGenerationBase(TestCaseDLKBase):
     """Test class for code generation testing."""
 
-    @params(*get_configurations())
-    def test_all_configuration(self, i, configuration) -> None:
+    project_name = 'code_generation'
 
+    def run_test_code_generation(self, i, configuration) -> None:
+
+        print(f"\nCode_generation test: testcase {configuration}")
         #  TODO consider better implementation
         this_test_level = configuration.get("test_level", 0)
         if this_test_level < CURRENT_TEST_LEVEL:
             self.codegen_cpu(test_id=i, **configuration)
+        else:
+            raise unittest.SkipTest(
+                f'test level of this test: {this_test_level}, current test level: {CURRENT_TEST_LEVEL}')
+
+    def run_test_binary_exec(self, i, configuration) -> None:
+
+        print(f"\nBinary_exec test: testcase {configuration}")
+        #  TODO consider better implementation
+        this_test_level = configuration.get("test_level", 0)
+        if this_test_level < CURRENT_TEST_LEVEL:
+            self.exec_binary(test_id=i, **configuration)
         else:
             raise unittest.SkipTest(
                 f'test level of this test: {this_test_level}, current test level: {CURRENT_TEST_LEVEL}')
@@ -492,6 +215,17 @@ class TestCodeGeneration(TestCaseDLKBase):
 
         return pf
 
+    def get_paths(self, model_path, prefix, test_id, cpu_name):
+        dir_tags = [str(test_id), prefix, basename(model_path), cpu_name]
+        output_path = join(self.build_dir, '_'.join(dir_tags))
+        input_dir_path = os.path.abspath(
+            os.path.join(os.getcwd(),
+                         model_path))
+
+        input_path = os.path.join(input_dir_path, 'minimal_graph_with_shape.pb')
+
+        return [output_path, input_path, input_dir_path]
+
     def codegen_cpu(self,
                     model_path,
                     expected_output_set_name,
@@ -516,21 +250,11 @@ class TestCodeGeneration(TestCaseDLKBase):
             if shutil.which('arm-linux-gnueabihf-g++') is None:
                 raise unittest.SkipTest('No arm compiler.')
 
-        dir_tags = [str(test_id), prefix, basename(model_path), cpu_name]
-        dir_tags = dir_tags + ['hq'] if hard_quantize else dir_tags
-        dir_tags = dir_tags + ['thskip'] if threshold_skipping else dir_tags
-
-        output_path = join(self.build_dir, '_'.join(dir_tags))
-        input_dir_path = os.path.abspath(
-            os.path.join(os.getcwd(),
-                         model_path))
-
-        input_path = os.path.join(input_dir_path, 'minimal_graph_with_shape.pb')
-        project_name = 'code_generation'
+        output_path, input_path, input_dir_path = self.get_paths(model_path, prefix, test_id, cpu_name)
 
         gp.run(input_path=input_path,
                dest_dir_path=output_path,
-               project_name=project_name,
+               project_name=self.project_name,
                activate_hard_quantization=hard_quantize,
                threshold_skipping=threshold_skipping,
                num_pe=16,
@@ -539,7 +263,7 @@ class TestCodeGeneration(TestCaseDLKBase):
                )
 
         lib_name = 'lib_' + cpu_name
-        project_dir = os.path.join(output_path, project_name + '.prj')
+        project_dir = os.path.join(output_path, self.project_name + '.prj')
         generated_lib = os.path.join(project_dir, lib_name + '.so')
         npy_targz = os.path.join(input_dir_path, expected_output_set_name + '.tar.gz')
 
@@ -550,10 +274,6 @@ class TestCodeGeneration(TestCaseDLKBase):
                       self,
                       check_stdout_include=[expected_output_set_name + '/raw_image.npy']
                       )
-
-        npy_path = os.path.join(output_path, expected_output_set_name)
-        input_path = os.path.join(npy_path, input_name)
-        expected_output_path = os.path.join(npy_path, output_npy_name)
 
         self.assertTrue(os.path.exists(project_dir))
 
@@ -589,6 +309,33 @@ class TestCodeGeneration(TestCaseDLKBase):
                       )
         self.assertTrue(os.path.exists(generated_lib))
 
+    def exec_binary(self,
+                    test_id,
+                    model_path,
+                    expected_output_set_name,
+                    prefix,
+                    input_name,
+                    output_npy_name,
+                    cpu_name='x86_64',
+                    hard_quantize=False,
+                    threshold_skipping=False,
+                    use_run_test_script=False,
+                    max_percent_incorrect_values=0.1,
+                    from_npy=False,
+                    need_arm_compiler=False,
+                    cache_dma=False,
+                    use_avx=False
+                   ) -> None:
+        output_path, input_path, _ = self.get_paths(model_path, prefix, test_id, cpu_name)
+
+        lib_name = 'lib_' + cpu_name
+        project_dir = os.path.join(output_path, self.project_name + '.prj')
+        generated_lib = os.path.join(project_dir, lib_name + '.so')
+        npy_path = os.path.join(output_path, expected_output_set_name)
+        input_path = os.path.join(npy_path, input_name)
+        expected_output_path = os.path.join(npy_path, output_npy_name)
+
+
         if not use_run_test_script:
             if cpu_name == 'x86_64':
                 percent_failed = self.run_library(generated_lib, input_path, expected_output_path)
@@ -602,7 +349,7 @@ class TestCodeGeneration(TestCaseDLKBase):
         self.assertTrue(percent_failed < max_percent_incorrect_values,
                         msg=f"Test failed: {percent_failed:.3f}% of the values does not match")
 
-        print(f"Codegen test {prefix}: passed!  {100.0 - percent_failed:.3f}% "
+        print(f"Binary exec test {prefix}: passed!  {100.0 - percent_failed:.3f}% "
               f"of the output values are correct\n"
               f"[hard quantize == {hard_quantize}, threshold skipping == {threshold_skipping}, cache == {cache_dma}]")
 
