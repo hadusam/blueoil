@@ -14,8 +14,8 @@
 # limitations under the License.
 # =============================================================================
 PROJECT_TAG = 'dlk'
-DO_CLEANUP = True
-DO_CLEANUP_OLDBUILD = False
+DO_CLEANUP = False
+DO_CLEANUP_OLDBUILD = True
 HOURS_ELAPSED_TO_ERASE = 24
 CURRENT_TEST_LEVEL=1
 FPGA_FILES='output_template/fpga'

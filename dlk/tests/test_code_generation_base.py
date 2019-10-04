@@ -39,6 +39,7 @@ def dict_codegen_classification(cpu_name) -> dict:
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '133_output:0.npy',
             'cpu_name': cpu_name,
+            'hard_quantize': True,
             }
 
 
@@ -50,6 +51,7 @@ def dict_codegen_classification_resnet(cpu_name) -> dict:
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '368_output:0.npy',
             'cpu_name': cpu_name,
+            'hard_quantize': True,
             }
 
 
@@ -61,6 +63,7 @@ def dict_codegen_object_detection(cpu_name) -> dict:
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '317_output:0.npy',
             'cpu_name': cpu_name,
+            'hard_quantize': True,
             }
 
 
@@ -72,6 +75,7 @@ def dict_codegen_segmentation(cpu_name) -> dict:
             'input_name': '000_images_placeholder:0.npy',
             'output_npy_name': '227_output:0.npy',
             'cpu_name': cpu_name,
+            'hard_quantize': True,
             }
 
 
@@ -216,23 +220,17 @@ class TestCodeGenerationBase(TestCaseDLKBase):
                     input_name,
                     output_npy_name,
                     cpu_name='x86_64',
-                    hard_quantize=False,
+                    hard_quantize=True,
                     threshold_skipping=False,
                     use_run_test_script=False,
                     max_percent_incorrect_values=0.1,
                     from_npy=False,
-                    need_arm_compiler=False,
                     cache_dma=False,
                     use_avx=False,
                     test_id=0
                     ) -> None:
 
         """Test code for testing code generation for CPU"""
-        # TODO consider better implementation
-        if need_arm_compiler:
-            if shutil.which('arm-linux-gnueabihf-g++') is None:
-                raise unittest.SkipTest('No arm compiler.')
-
         output_path, input_path, input_dir_path = self.get_paths(model_path, prefix, test_id, cpu_name)
 
         gp.run(input_path=input_path,
@@ -260,12 +258,15 @@ class TestCodeGenerationBase(TestCaseDLKBase):
 
         self.assertTrue(os.path.exists(project_dir))
 
+        cmake_use_aarch64 = '-DTOOLCHAIN_NAME=linux_aarch64'
         cmake_use_arm = '-DTOOLCHAIN_NAME=linux_arm'
         cmake_use_neon = '-DUSE_NEON=1'
         cmake_use_fpga = '-DRUN_ON_FPGA=1'
         cmake_use_avx = '-DUSE_AVX=1'
 
         cmake_defs = []
+        if cpu_name == 'aarch64':
+            cmake_defs += [cmake_use_aarch64, cmake_use_neon]
         if cpu_name == 'arm':
             cmake_defs += [cmake_use_arm, cmake_use_neon]
         if cpu_name == 'arm_fpga':
@@ -300,12 +301,11 @@ class TestCodeGenerationBase(TestCaseDLKBase):
                     input_name,
                     output_npy_name,
                     cpu_name='x86_64',
-                    hard_quantize=False,
+                    hard_quantize=True,
                     threshold_skipping=False,
                     use_run_test_script=False,
                     max_percent_incorrect_values=0.1,
                     from_npy=False,
-                    need_arm_compiler=False,
                     cache_dma=False,
                     use_avx=False) -> None:
         output_path, input_path, _ = self.get_paths(model_path, prefix, test_id, cpu_name)

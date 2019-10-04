@@ -22,10 +22,10 @@ from testcase_dlk_base import TestCaseFPGABase
 def get_configurations():
     cpu_name = "arm_fpga"
     test_cases = [
-        {'hard_quantize': True, 'need_arm_compiler': True, 'cache_dma': True, 'threshold_skipping': True},
-        {'hard_quantize': True, 'need_arm_compiler': True, 'cache_dma': True, 'threshold_skipping': False},
-        {'hard_quantize': True, 'need_arm_compiler': True, 'cache_dma': False, 'threshold_skipping': True},
-        {'hard_quantize': True, 'need_arm_compiler': True, 'cache_dma': False, 'threshold_skipping': False},
+        {'cache_dma': True, 'threshold_skipping': True},
+        {'cache_dma': True, 'threshold_skipping': False},
+        {'cache_dma': False, 'threshold_skipping': True},
+        {'cache_dma': False, 'threshold_skipping': False},
     ]
     configurations = get_configurations_by_architecture(test_cases, cpu_name)
 

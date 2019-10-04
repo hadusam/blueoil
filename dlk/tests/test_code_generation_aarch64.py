@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =============================================================================
-"""Test file for code generation of arm"""
+"""Test file for code generation of aarch64"""
 from nose2.tools import params
 from test_code_generation_base import TestCodeGenerationBase, get_configurations_by_architecture
 from testcase_dlk_base import TestCaseFPGABase
 
 
 def get_configurations():
-    cpu_name = "arm"
+    cpu_name = "aarch64"
     test_cases = [
         {'cache_dma': True, 'threshold_skipping': True},
         {'cache_dma': True, 'threshold_skipping': False},
@@ -32,10 +32,9 @@ def get_configurations():
     return [(i, configuration) for i, configuration in enumerate(configurations)]
 
 
-class TestCodeGenerationArm(TestCodeGenerationBase, TestCaseFPGABase):
+class TestCodeGenerationArm(TestCodeGenerationBase):
     """Test class for code generation testing of arm."""
 
     @params(*get_configurations())
     def test_code_generation(self, i, configuration) -> None:
         self.run_test_code_generation(i, configuration)
-        self.run_test_binary_exec(i, configuration)

@@ -41,28 +41,38 @@ class TestCaseDLKBase(TestCase):
     """
     build_dir = None
 
-    def setUp(self) -> None:
-        """
-        Cleanup old build directory and make build directory
-        """
-
-        prefix0 = "-".join(["test", PROJECT_TAG])
+    @classmethod
+    def setUpClass(cls):
+        """ Make build directory """
 
         if DO_CLEANUP_OLDBUILD:
-            dirnames = glob(tempfile.gettempdir() + '/' + prefix0 + '*')
-            for dirname in dirnames:
-                second_erapsed = time.time() - os.stat(dirname).st_mtime
-                if second_erapsed > SECOND_PER_HOUR * HOURS_ELAPSED_TO_ERASE:
-                    rmdir(dirname)
-                    print(f'Old directory {dirname} deleted')
+            build_dir = cls.getClassDir()
+            rmdir(build_dir)
+            print(f'Old directory {build_dir} deleted')
 
-        datetimetag = datetime.now().strftime("%Y%m%d%H%M")
+        if not os.path.exists(build_dir):
+            os.mkdir(build_dir)
+
+
+    @classmethod
+    def getClassDir(self):
+        """ Get build directory """
+
+        base_dir = os.path.join(os.getcwd(), "outputs")
+        prefix = "-".join(["test", PROJECT_TAG])
         classtag = self.__class__.__name__
+        build_dir = "-".join([prefix, classtag])
 
-        prefix = "-".join([prefix0, classtag, datetimetag]) + "-"
-        self.build_dir = tempfile.mkdtemp(prefix=prefix)
+        return os.path.join(base_dir, build_dir)
 
-    def tearDown(self) -> None:
+
+    def setUp(self):
+        """ Set build directory """
+
+        self.build_dir = self.getClassDir()
+
+
+    def tearDownClass(self) -> None:
         if DO_CLEANUP:
             rmdir(self.build_dir)
 
@@ -72,10 +82,10 @@ class TestCaseFPGABase(TestCaseDLKBase):
     This is base class for FPGA TestCase which have
     Setup and TearDown method.
     """
-    build_dir = None
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(TestCaseDLKBase):
+        super().setUpClass()
         # Setup the board. For now, DE10 Nano board
         output_path = '/tmp'
         hw_path = os.path.abspath(os.path.join('..', FPGA_FILES))
