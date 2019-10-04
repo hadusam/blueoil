@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =============================================================================
-"""Test file for code generation"""
+"""Test file for code generation of x86_64"""
 from nose2.tools import params
 from test_code_generation_base import TestCodeGenerationBase, get_configurations_by_architecture
 from test_code_generation_base import get_configurations_by_test_cases, dict_codegen_classification

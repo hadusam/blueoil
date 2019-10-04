@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =============================================================================
-"""Test file for code generation"""
+"""Base test file for code generation"""
 import inspect
 import numpy as np
 import os
