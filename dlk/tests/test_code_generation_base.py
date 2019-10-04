@@ -14,24 +14,21 @@
 # limitations under the License.
 # =============================================================================
 """Test file for code generation"""
+import inspect
 import numpy as np
 import os
-import inspect
-from os.path import join, basename
 import shutil
 import sys
 import unittest
-from nose2.tools import params
 
 from scripts import generate_project as gp
 from scripts.pylib.nnlib import NNLib as NNLib
+from testcase_dlk_base import TestCaseDLKBase
+from tstconf import CURRENT_TEST_LEVEL
+from tstutils import updated_dict, run_and_check, FPGA_HOST
 
 sys.path.append("utils")  # PEP8:ignore
 import run_test as inference  # PEP8:ignore
-
-from testcase_dlk_base import TestCaseDLKBase
-from tstconf import CURRENT_TEST_LEVEL
-from tstutils import updated_dict, run_and_check, TEST_LEVEL_FUTURE_TARGET, FPGA_HOST
 
 
 def dict_codegen_classification(cpu_name) -> dict:
@@ -77,12 +74,14 @@ def dict_codegen_segmentation(cpu_name) -> dict:
             'cpu_name': cpu_name,
             }
 
+
 def get_configurations_by_test_cases(test_cases, configuration):
     configurations = []
     for test_case in test_cases:
-        configurations.append(updated_dict(configuration,test_case))
+        configurations.append(updated_dict(configuration, test_case))
 
     return configurations
+
 
 def get_configurations_by_architecture(test_cases, cpu_name):
     configurations = []
@@ -150,58 +149,43 @@ class TestCodeGenerationBase(TestCaseDLKBase):
                               library: str,
                               input_npy: str, expected_output_npy: str) -> float:
 
-        run_and_check(
-            [ "ssh",
-             f"root@{host}",
-             f"rm -rf ~/automated_testing/*"
-            ],
-            output_path,
-            join(output_path, "clean.err"),
-            join(output_path, "clean.err"),
-            self)
+        run_and_check(["ssh", f"root@{host}", f"rm -rf ~/automated_testing/*"],
+                      output_path,
+                      os.path.join(output_path, "clean.err"),
+                      os.path.join(output_path, "clean.err"),
+                      self)
 
         lib_name = os.path.basename(library)
         input_name = os.path.basename(input_npy)
         output_name = os.path.basename(expected_output_npy)
 
-        run_library_code  =  "import numpy as np\n"
-        run_library_code +=  "from nnlib import NNLib as NNLib\n"
-        run_library_code +=  "class testing:\n"
-        run_library_code +=  inspect.getsource(self.run_library)
-        run_library_code +=  "if __name__ == '__main__':\n"
-        run_library_code +=  "  t = testing()\n"
+        run_library_code = "import numpy as np\n"
+        run_library_code += "from nnlib import NNLib as NNLib\n"
+        run_library_code += "class testing:\n"
+        run_library_code += inspect.getsource(self.run_library)
+        run_library_code += "if __name__ == '__main__':\n"
+        run_library_code += "  t = testing()\n"
         run_library_code += f"  print(t.run_library('./{lib_name}', './{input_name}', './{output_name}'))\n"
 
         testing_code_name = "testing_code.py"
-        testing_code_path = join(output_path, testing_code_name)
+        testing_code_path = os.path.join(output_path, testing_code_name)
         with open(testing_code_path, "w") as code_file:
             code_file.write(run_library_code)
 
-        run_and_check(
-            [ "scp",
-              library,
-              input_npy,
-              expected_output_npy,
-              inspect.getfile(NNLib),
-              testing_code_path,
-             f"root@{host}:~/automated_testing/"
-            ],
-            output_path,
-            join(output_path, "scp.out"),
-            join(output_path, "scp.err"),
-            self)
+        run_and_check(["scp", library, input_npy, expected_output_npy, inspect.getfile(NNLib),
+                       testing_code_path, f"root@{host}:~/automated_testing/"],
+                      output_path,
+                      os.path.join(output_path, "scp.out"),
+                      os.path.join(output_path, "scp.err"),
+                      self)
 
-        remote_output_file = join(output_path, "remote.out")
-        run_and_check(
-            [ "ssh",
-             f"root@{host}",
-             f"cd ~/automated_testing/; python {testing_code_name}"
-            ],
-            output_path,
-            remote_output_file,
-            join(output_path, "remote.err"),
-            self,
-            keep_outputs=True)
+        remote_output_file = os.path.join(output_path, "remote.out")
+        run_and_check(["ssh", f"root@{host}", f"cd ~/automated_testing/; python {testing_code_name}"],
+                      output_path,
+                      remote_output_file,
+                      os.path.join(output_path, "remote.err"),
+                      self,
+                      keep_outputs=True)
 
         with open(remote_output_file, "r") as remote_output_file:
             remote_output = remote_output_file.read()
@@ -209,14 +193,14 @@ class TestCodeGenerationBase(TestCaseDLKBase):
         pf = 100.0
         try:
             pf = float(remote_output)
-        except:
+        except ValueError:
             pf = 100.0
 
         return pf
 
     def get_paths(self, model_path, prefix, test_id, cpu_name):
-        dir_tags = [str(test_id), prefix, basename(model_path), cpu_name]
-        output_path = join(self.build_dir, '_'.join(dir_tags))
+        dir_tags = [str(test_id), prefix, os.path.basename(model_path), cpu_name]
+        output_path = os.path.join(self.build_dir, '_'.join(dir_tags))
         input_dir_path = os.path.abspath(
             os.path.join(os.getcwd(),
                          model_path))
@@ -268,31 +252,31 @@ class TestCodeGenerationBase(TestCaseDLKBase):
 
         run_and_check(['tar', 'xvzf', str(npy_targz), '-C', str(output_path)],
                       input_dir_path,
-                      join(output_path, "tar_xvzf.out"),
-                      join(output_path, "tar_xvzf.err"),
+                      os.path.join(output_path, "tar_xvzf.out"),
+                      os.path.join(output_path, "tar_xvzf.err"),
                       self,
                       check_stdout_include=[expected_output_set_name + '/raw_image.npy']
                       )
 
         self.assertTrue(os.path.exists(project_dir))
 
-        cmake_use_arm =  '-DTOOLCHAIN_NAME=linux_arm'
+        cmake_use_arm = '-DTOOLCHAIN_NAME=linux_arm'
         cmake_use_neon = '-DUSE_NEON=1'
         cmake_use_fpga = '-DRUN_ON_FPGA=1'
-        cmake_use_avx =  '-DUSE_AVX=1'
+        cmake_use_avx = '-DUSE_AVX=1'
 
         cmake_defs = []
         if cpu_name == 'arm':
             cmake_defs += [cmake_use_arm, cmake_use_neon]
         if cpu_name == 'arm_fpga':
             cmake_defs += [cmake_use_arm, cmake_use_neon, cmake_use_fpga]
-        if use_avx == True:
+        if use_avx is True:
             cmake_defs += [cmake_use_avx]
 
         run_and_check(['cmake'] + cmake_defs + ['.'],
                       project_dir,
-                      join(output_path, "cmake.out"),
-                      join(output_path, "cmake.err"),
+                      os.path.join(output_path, "cmake.out"),
+                      os.path.join(output_path, "cmake.err"),
                       self,
                       check_stdout_include=['Generating done'],
                       check_stdout_block=['CMake Error']
@@ -300,8 +284,8 @@ class TestCodeGenerationBase(TestCaseDLKBase):
 
         run_and_check(['make', 'VERBOSE=1', 'lib', '-j8'],
                       project_dir,
-                      join(output_path, "make.out"),
-                      join(output_path, "make.err"),
+                      os.path.join(output_path, "make.out"),
+                      os.path.join(output_path, "make.err"),
                       self,
                       check_stdout_include=['Building'],
                       check_stderr_block=['error: ']
@@ -323,8 +307,7 @@ class TestCodeGenerationBase(TestCaseDLKBase):
                     from_npy=False,
                     need_arm_compiler=False,
                     cache_dma=False,
-                    use_avx=False
-                   ) -> None:
+                    use_avx=False) -> None:
         output_path, input_path, _ = self.get_paths(model_path, prefix, test_id, cpu_name)
 
         lib_name = 'lib_' + cpu_name
@@ -333,7 +316,6 @@ class TestCodeGenerationBase(TestCaseDLKBase):
         npy_path = os.path.join(output_path, expected_output_set_name)
         input_path = os.path.join(npy_path, input_name)
         expected_output_path = os.path.join(npy_path, output_npy_name)
-
 
         if not use_run_test_script:
             if cpu_name == 'x86_64':
